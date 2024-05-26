@@ -20,7 +20,8 @@ const {
   handlesumPriceB,
   handlesumForChart,
   handleselectBillConfirm,
-  generateBilling
+  generateBilling,
+  handleSumLimit
 } = require('../controller/filterController')
 
 router.get('/listProduct', handleAllProduct)
@@ -40,5 +41,6 @@ router.get('/sumpriceb', handlesumPriceB)
 router.get('/sumForChart', handlesumForChart)
 router.get('/selectBillConfirm', handleselectBillConfirm)
 router.post('/getDataPrint', generateBilling)
+router.get('/sumLimit', handleSumLimit)
 
 module.exports = router

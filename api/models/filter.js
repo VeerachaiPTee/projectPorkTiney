@@ -29,6 +29,15 @@ class Filter {
     return sqlcmd(query)
   }
 
+  static sumLimit() {
+    const query = `SELECT NAME, COUNT(PID) AS PID, SUM(TOTAL * PRICE) AS ALLTOTALPRODUCT 
+    FROM allsell 
+    GROUP BY NAME 
+    ORDER BY PID DESC 
+    LIMIT 3`
+    return sqlcmd(query)
+  }
+
   static minusProduct(udTotal, id) {
     const query = `UPDATE PRODUCT SET TOTAL = ${udTotal} where id = ${id}`
     return sqlcmd(query)
@@ -109,7 +118,6 @@ class Filter {
     const query = `UPDATE ALLSELL SET STATUSBILL = ${STATUSBILL} WHERE BILL_ID = "${BILL_ID}"`
     return sqlcmd(query)
   }
-  
 }
 
 module.exports = Filter

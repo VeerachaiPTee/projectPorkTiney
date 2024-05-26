@@ -148,6 +148,22 @@
               </v-row>
             </v-container>
           </v-col>
+          <v-col cols="12" class="display-1 text-center"
+            >สินค้าที่ขายดี 3 อันดับ</v-col
+          >
+          <v-col
+            cols="4"
+            v-for="(item, index) in sumP"
+            :key="index"
+            class="mx-auto"
+          >
+            <v-container>
+              <v-card width="300px" rounded="xl">
+                <v-card-title>รายการ {{ item.NAME }} </v-card-title>
+                <v-card-text>จำนวน {{ item.ALLTOTALPRODUCT }} แพค</v-card-text>
+              </v-card>
+            </v-container>
+          </v-col>
         </v-row>
       </div>
     </v-sheet>
@@ -209,14 +225,17 @@ export default {
       ],
       productData: [],
       pigData: null,
+      sumP: [],
     }
   },
   mounted() {
     this.apiPig()
+    this.apiSumP()
   },
   methods: {
     ...mapActions({
       listpig: 'users/listProducts',
+      sumLimit: 'users/sumLimit',
     }),
     goShopPage() {
       this.$router.push({ path: '/shopPage' })
@@ -227,6 +246,10 @@ export default {
     async apiPig() {
       this.productData = await this.listpig()
       // console.log(this.productData)
+    },
+    async apiSumP() {
+      this.sumP = await this.sumLimit()
+      console.log(this.sumP)
     },
   },
   computed: {

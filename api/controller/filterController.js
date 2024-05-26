@@ -26,9 +26,37 @@ const handleAllAdmin = async (req, res, next) => {
 const handleselectBillOrder = async (req, res, next) => {
   try {
     const result = await Filter.selectBillOrder()
+    if (result.length > 0) {
+      // ส่งข้อความแจ้งเตือนผ่าน LINE Notify API
+      // console.log(result);
+
+      await sendLineNotification(result)
+    }
     res.status(200).send(result)
   } catch (error) {
     res.status(500).json({ message: error.message })
+  }
+}
+
+async function sendLineNotification(data) {
+  try {
+    // Access Token ที่ได้จาก LINE Notify
+    const accessToken = 'uQbeC9uOZkSiuSBmsx0Gv7dMKTYJb4Bk7pBsqqhCTIn'
+    const message = 'มีรายการสั่งซื้อใหม่ ' + data.length + ' รายการ'
+
+    // ส่งข้อความผ่าน LINE Notify API
+    const response = await fetch('https://notify-api.line.me/api/notify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: new URLSearchParams({ message }),
+    })
+    const jsonResponse = await response.json()
+    console.log('Notification sent:', jsonResponse)
+  } catch (error) {
+    console.error('Notification error:', error)
   }
 }
 
@@ -73,7 +101,9 @@ const handleCheckSlip = async (req, res) => {
         'x-authorization': 'SLIPOKPBWBRSE',
         ...formdata.getHeaders(),
       },
+
       body: formdata,
+      log: true,
     })
 
     const data = await result.json()
@@ -243,6 +273,11 @@ const handleselectBillConfirm = async (req, res) => {
 //     res.status(500).json({ message: error.message });
 //   }
 // };
+function jumpLine(doc, lines) {
+  for (let index = 0; index < lines; index++) {
+    doc.moveDown()
+  }
+}
 
 const generateBilling = async (req, res, next) => {
   const { data } = req.body
@@ -265,7 +300,8 @@ const generateBilling = async (req, res, next) => {
     const pdfData = [] // Create an empty array to store the PDF data
     const distanceMargin = 8
     doc
-      .fillAndStroke('#0e8cc3')
+      .stroke('#dd1818')
+      .fill('#000000')
       .lineWidth(5)
       .lineJoin('round')
       .rect(
@@ -278,7 +314,13 @@ const generateBilling = async (req, res, next) => {
     doc.font('THSarabunNew')
     doc.fontSize(12)
     // Header
-    doc.text('Billing Report', { align: 'center' })
+    const maxWidth = 100
+    const maxHeight = 50
+    doc.image('assets/logo.png', doc.page.width / 2 - maxWidth / 2, 2, {
+      fit: [maxWidth, maxHeight],
+      align: 'center',
+    })
+    jumpLine(doc, 2)
     // Customer Information
     doc.text(`ชื่อลูกค้า: ${data.CUSTOMER}`, { align: 'left' })
     doc.text(`เบอร์โทร: ${data.TEL}`, { align: 'left' })
@@ -291,7 +333,7 @@ const generateBilling = async (req, res, next) => {
       doc.text(item, { align: 'left' })
     }
 
-    doc.text(`ยอดรวม: ${data.TotalPrice}`, { align: 'left' })
+    doc.text(`ยอดรวม: ${data.TotalPrice} บาท`, { align: 'left' })
     doc.end()
 
     const pdfStream = doc.pipe(new PassThrough())
@@ -311,6 +353,15 @@ const generateBilling = async (req, res, next) => {
   }
 }
 
+const handleSumLimit = async (req, res) => {
+  try {
+    const result = await Filter.sumLimit()
+    res.status(200).send(result)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 module.exports = {
   generateBilling,
   handleAllProduct,
@@ -327,4 +378,5 @@ module.exports = {
   handlesumPriceB,
   handlesumForChart,
   handleselectBillConfirm,
+  handleSumLimit
 }

@@ -49,6 +49,16 @@ export default {
         return Promise.reject(err)
       })
   },
+  sumLimit({ commit }, data) {
+    return this.$axios
+      .$get('api/filter/sumLimit')
+      .then((response) => {
+        return Promise.resolve(response)
+      })
+      .catch((err) => {
+        return Promise.reject(err)
+      })
+  },
 
   minusProduct({ commit }, data) {
     return this.$axios

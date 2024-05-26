@@ -565,14 +565,11 @@ export default {
         // แสดงเวลาที่เหลือบนหน้าจอ
         const minutes = Math.floor(remainingTime / 60000)
         const seconds = Math.floor((remainingTime % 60000) / 1000)
-
         this.remainingTime = `${minutes}:${seconds.toString().padStart(2, '0')}`
       }
     },
 
-    gg() {},
-
-    paymentClose() {
+    paymentClose() {  
       try {
         this.dialogPayment = false
       } catch (error) {

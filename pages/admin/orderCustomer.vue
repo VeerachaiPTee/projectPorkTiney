@@ -143,6 +143,7 @@ export default {
                 window.URL.revokeObjectURL(pdfUrl)
                 document.body.removeChild(downloadLink)
               }, 100)
+        
               // const blob = new Blob([bytes], { type: 'application/pdf' })
               // const url = window.URL.createObjectURL(blob)
               // const link = document.createElement('a')
